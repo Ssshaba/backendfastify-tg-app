@@ -64,16 +64,22 @@ interface UpdateUserData {
     role?: string;
     status?: string;
 }
-
 export const UpdateUser = async (req: FastifyRequest<{ Params: { tgId: string } }>, reply: FastifyReply) => {
     try {
-        const userId = parseInt(req.params.tgId);
+        const tgId = parseInt(req.params.tgId);
 
-        const userData = req.body as UpdateUserData;
+        // Находим пользователя по tgId
+        const user = await prisma.user.findFirst({ where: { tgId } });
 
+        // Проверяем, найден ли пользователь
+        if (!user) {
+            return reply.status(404).send({ error: 'User not found' });
+        }
+
+        // Используем найденный id для обновления пользователя
         const updatedUser = await prisma.user.update({
-            where: { tgId: userId },
-            data: userData,
+            where: { id: user.id },
+            data: req.body as UpdateUserData,
         });
 
         reply.code(200).send(updatedUser);
@@ -83,4 +89,6 @@ export const UpdateUser = async (req: FastifyRequest<{ Params: { tgId: string } 
     } finally {
         await prisma.$disconnect();
     }
+
+
 };
