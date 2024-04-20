@@ -19,7 +19,8 @@ model User {
 }
 
 model Stock {
-  id   Int    @id @default(autoincrement())
-  link String
-  name String
+  id          Int     @id @default(autoincrement())
+  link        String
+  description String?
+  conditions  String?
 }
