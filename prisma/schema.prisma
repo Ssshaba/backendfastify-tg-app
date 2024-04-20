@@ -8,14 +8,17 @@ datasource db {
 }
 
 model User {
-  id     Int     @id @default(autoincrement())
-  tgId   String
-  name   String?
-  role   String?
-  status String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  tgId       String
+  name       String?
+  role       String?
+  status     String?
+  age        Int?
+  hobbies    String?
+  department String?
+  photoLink  String?  @default("https://persikivk.ru/uploads/avatar.png")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Stock {

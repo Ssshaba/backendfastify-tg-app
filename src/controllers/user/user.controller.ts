@@ -63,7 +63,12 @@ interface UpdateUserData {
     tgId?: string;
     role?: string;
     status?: string;
+    age?: number;
+    hobbies?: string;
+    department?: string;
+    photoLink?: string;
 }
+
 export const UpdateUser = async (req: FastifyRequest<{ Params: { tgId: string } }>, reply: FastifyReply) => {
     try {
         const tgId = req.params.tgId; // Не преобразовываем tgId в число
