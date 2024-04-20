@@ -4,7 +4,7 @@ const prisma = new PrismaClient(); // Создайте экземпляр Prisma
 
 interface UserData {
     name: string;
-    tgId: number;
+    tgId: string;
     role?: string;
     status?: string;
 }
@@ -26,7 +26,7 @@ export const CreateUser = async (req: FastifyRequest, reply: FastifyReply) => {
         reply.code(201).send(newUser);
     } catch (error) {
         console.error(error);
-        reply.status(500).send({ error: 'An error occurred' });
+        reply.status(500).send({ error: error.message }); // Отправляем сообщение об ошибке
     } finally {
         await prisma.$disconnect();
     }
@@ -60,7 +60,7 @@ export const GetRandomUser = async (req: FastifyRequest, reply: FastifyReply) =>
 
 interface UpdateUserData {
     name?: string;
-    tgId?: number;
+    tgId?: string;
     role?: string;
     status?: string;
 }

@@ -9,8 +9,8 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  tgId      Int
-  name      String
+  tgId      String
+  name      String?
   role      String?
   status    String?
   createdAt DateTime @default(now())
