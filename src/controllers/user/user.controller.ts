@@ -66,7 +66,7 @@ interface UpdateUserData {
 }
 export const UpdateUser = async (req: FastifyRequest<{ Params: { tgId: string } }>, reply: FastifyReply) => {
     try {
-        const tgId = parseInt(req.params.tgId);
+        const tgId = req.params.tgId; // Не преобразовываем tgId в число
 
         // Находим пользователя по tgId
         const user = await prisma.user.findFirst({ where: { tgId } });
@@ -89,6 +89,16 @@ export const UpdateUser = async (req: FastifyRequest<{ Params: { tgId: string } 
     } finally {
         await prisma.$disconnect();
     }
+};
 
-
+export const GetStocks = async (req: FastifyRequest, reply: FastifyReply) => {
+    try {
+        const allStocks = await prisma.stock.findMany();
+        reply.code(200).send(allStocks);
+    } catch (error) {
+        console.error(error);
+        reply.status(500).send({ error: 'An error occurred' });
+    } finally {
+        await prisma.$disconnect();
+    }
 };
