@@ -1,5 +1,10 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { PrismaClient } from '@prisma/client';
+import path from "path";
+import crypto from "crypto";
+import fs from "fs";
+
+import shortid from 'shortid';
 const prisma = new PrismaClient(); // Создайте экземпляр PrismaClient
 
 interface UserData {
@@ -107,3 +112,67 @@ export const GetStocks = async (req: FastifyRequest, reply: FastifyReply) => {
         await prisma.$disconnect();
     }
 };
+
+
+
+export const UploadUserPhoto = async (req: FastifyRequest<{ Params: { tgId: string } }>, reply: FastifyReply) => {
+    try {
+        const tgId = req.params.tgId;
+        const body = req.body as { file?: { toBuffer: () => Promise<Buffer> } };
+
+        if (!body.file) {
+            return reply.code(400).send({ error: 'No file uploaded' });
+        }
+        let fileValue: Buffer | undefined;
+
+        // @ts-ignore
+        const filename = body.file ? req.body.file.filename : 'файл не загружен';
+        const fileExtension = path.extname(filename).slice(1); // slice(1) убирает точку перед расширением
+        const hashedFilename = crypto.createHash('sha256').update(filename).digest('hex');
+        // const timestamp = new Date().getTime();
+        const uniqueFilename = `${shortid.generate()}.${fileExtension}`; // ${timestamp}-${filename}
+        let fileFileLink: string | undefined;
+        let fileLink: string | undefined;
+
+        if (body.file) {
+            fileValue = await body.file.toBuffer();
+            // @ts-ignore
+
+            if (fileValue) {
+                const filePath = '/opt/upload/' + uniqueFilename;// локально const filePath = `../upload/${uniqueFilename}`;
+
+                fs.writeFile(filePath, fileValue, (err) => {
+                    if (err) {
+                        console.error('Ошибка при сохранении файла:', err);
+                    } else {
+                        console.log('Файл успешно сохранен с именем:', filename);
+                    }
+                });
+            }
+            fileLink = `https://persikivk.ru/uploads/${uniqueFilename}`;
+        }
+        // Находим пользователя по tgId
+        const user = await prisma.user.findFirst({ where: { tgId } });
+
+        // Проверяем, найден ли пользователь
+        if (!user) {
+            return reply.status(404).send({ error: 'User not found' });
+        }
+
+        // Используем найденный id для обновления пользователя
+        const updatedUser = await prisma.user.update({
+            where: { id: user.id }, // Используем уникальное поле пользователя (например, id)
+            data: { photoLink: fileLink },
+        });
+
+
+        reply.code(200).send(updatedUser);
+
+    } catch (error) {
+        console.error(error);
+        return reply.status(500).send({ error: 'An error occurred' });
+    }
+}
+
+
+

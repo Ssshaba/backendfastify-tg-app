@@ -67,6 +67,7 @@
     "pdf-page-counter": "^1.0.3",
     "sendpulse-api": "1.1.6",
     "sync": "^0.2.5",
+    "shortid": "^2.2.16",
     "uuid": "^9.0.0",
     "winston": "^3.8.2",
     "yaml": "^2.2.2"

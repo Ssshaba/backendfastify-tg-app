@@ -8,12 +8,22 @@ import {swaggerOptions, swaggerUiOptions} from "./lib/swagger";
 import dotenv from 'dotenv';
 import userRoutes from "./routes/user/user.route";
 
+import {fastifyMultipart} from '@fastify/multipart';
+
 
 dotenv.config();
 
 const server = fastify()
 
 async function start() {
+
+    await server.register(fastifyMultipart, {
+        attachFieldsToBody: true,
+        limits: {
+            fileSize: 5 * 1024 * 1024, // 5 MB
+        },
+    } ); // { attachFieldsToBody: "keyValues", onFile}
+
 
     await server.register(fastifySwagger, swaggerOptions);
     await server.register(fastifySwaggerUi, swaggerUiOptions);
@@ -25,6 +35,8 @@ async function start() {
     await server.register(userRoutes, {
         prefix: '/api/users',
     });
+
+
 
     server.get('/ping', async (request, reply) => {
         return 'pong\n'
