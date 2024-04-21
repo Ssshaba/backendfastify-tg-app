@@ -62,6 +62,26 @@ export const GetRandomUser = async (req: FastifyRequest, reply: FastifyReply) =>
         await prisma.$disconnect();
     }
 };
+export const GetUser = async (req: FastifyRequest<{ Params: { tgId: string } }>, reply: FastifyReply) => {
+    try {
+        const tgId = req.params.tgId; // Получаем tgId из параметров запроса
+
+        // Находим пользователя по tgId
+        const user = await prisma.user.findFirst({ where: { tgId } });
+
+        // Проверяем, найден ли пользователь
+        if (!user) {
+            return reply.status(404).send({ error: 'User not found' });
+        }
+
+        // Отправляем пользователя в ответе
+        reply.code(200).send(user);
+    } catch (error) {
+        console.error(error);
+        return reply.status(500).send({ error: 'An error occurred' });
+    }
+};
+
 
 interface UpdateUserData {
     name?: string;

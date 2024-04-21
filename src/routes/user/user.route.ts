@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import {
-    CreateUser, GetAllUsers, GetRandomUser, GetStocks, UpdateUser, UploadUserPhoto
+    CreateUser, GetAllUsers, GetRandomUser, GetStocks, GetUser, UpdateUser, UploadUserPhoto
 
 } from "../../controllers/user/user.controller";
 
@@ -8,6 +8,7 @@ const userRoutes = (fastify: FastifyInstance, opts: any, next: (err?: Error) => 
 
     fastify.post('/create', CreateUser );
     fastify.put('/update/:tgId', UpdateUser);
+    fastify.get('/getUser/:tgId', GetUser);
     fastify.get('/', GetAllUsers );
     fastify.get('/random-user', GetRandomUser );
 
